@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html ng-app>
+<head>
+<script src="https://code.jquery.com/jquery.min.js"></script>
+<link href="https://netdna.bootstrapcdn.com/twitter-bootstrap/2.3.2/css/bootstrap-combined.min.css" rel="stylesheet" type="text/css" />
+<script src="https://netdna.bootstrapcdn.com/twitter-bootstrap/2.3.2/js/bootstrap.min.js"></script>
+  <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.2.26/angular.min.js"></script>
+  <meta charset="utf-8">
+  <title>JS Bin</title>
+</head>
+<body ng-controller="MainCtrl as main">
+
+  <form name="form1">
+    商品名稱: <input type="text" name="PName" ng-model="main.PName" required>
+    <span style="color: red" ng-if="form1.PName.$invalid">請輸入商品名稱</span>
+    <br>
+    購買數量: <input type="number" name="Qty" ng-model="main.Qty" required><br>
+    商品單價: <input type="number" name="Price" ng-model="main.Price" required><br>
+    <br>
+    您購買 {{main.PName}} 商品，單價 NT$ <span style="color:red">{{main.Price|number}}</span> 元，買了 {{main.Qty}} 件，共 NT$ {{main.subtotal(main.Qty, main.Price)|number:0}} 元。
+    <br>
+    <br>
+    <button ng-click="main.add()" ng-disabled="form1.$invalid">加入購物車</button>
+  </form>
+
+  <br><br>
+  <label><input type="checkbox" ng-model="main.IsDebug"> 啟用偵錯</label>
+  <br>
+  <pre ng-if="main.IsDebug">{{main.carts|json}}</pre>
+  
+  <table class="table">
+    <caption>
+      <input type="text" ng-model="main.keyword" placeholder="請輸入關鍵字搜尋">
+      <button class="btn">搜尋</button>
+      <button class="btn" ng-click="main.keyword='';">取消</button>
+    </caption>
+    <tr>
+      <th>
+        <input type="checkbox" ng-model="main.IsCheckAll" ng-change="main.CheckAll()">
+      </th>
+      <th>#</th>
+      <th>商品名稱</th>
+      <th>
+        <a class="btn" ng-click="main.cartsOrderBy='Price'">↑</a>
+        商品價格
+        <a class="btn" ng-click="main.cartsOrderBy='-Price'">↓</a>
+      </th>
+      <th>購買數量</th>
+      <th>小計</th>
+      <th>功能</th>
+    </tr>
+    <tr ng-repeat="item in main.carts|filter:{'PName': main.keyword}|orderBy:main.cartsOrderBy">
+      <td>
+        <input type="checkbox" ng-model="item.IsDelete">
+      </td>
+      <td>{{$index+1}}</td>
+      <td>{{item.PName}}</td>
+      <td>NT${{item.Price|number}}</td>
+      <td>
+        <a class="btn" ng-click="main.addQty(item,-1)">-</a>
+        {{item.Qty}}
+        <a class="btn" ng-click="main.addQty(item, 1)">+</a>
+      </td>
+      <td>NT$ {{main.subtotal(item.Qty, item.Price)|number}}</td>
+      <td>
+        <button ng-click="main.del(item)">刪除</button>
+      </td>
+    </tr>
+    <tr>
+      <th colspan="2">
+        <button ng-click="main.batchDelete()">批次刪除</button>
+      </th>
+      <th></th>
+      <th></th>
+      <th>總計</th>
+      <th>NT$ {{main.sum()|number}}</th>
+      <th></th>
+    </tr>
+  </table>
+  <br><br>
+</body>
+</html>
